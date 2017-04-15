@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="en" datatype="plaintext"  original="file.ext">
+        <body>
+            <trans-unit id="link_media">
+                <source>link_media</source>
+                <target>Link media</target>
+            </trans-unit>
+            <trans-unit id="no_linked_media">
+                <source>no_linked_media</source>
+                <target>No linked media</target>
+            </trans-unit>
+            <trans-unit id="Binary Content">
+                <source>Binary Content</source>
+                <target>File</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_default">
+                <source>sidemenu.link_context_default</source>
+                <target>Default</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_news">
+                <source>sidemenu.link_context_news</source>
+                <target>News</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_user">
+                <source>sidemenu.link_context_user</source>
+                <target>Users</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_sonata_collection">
+                <source>sidemenu.link_context_sonata_collection</source>
+                <target>Collections</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_sonata_category">
+                <source>sidemenu.link_context_sonata_category</source>
+                <target>Categories</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_download">
+                <source>sidemenu.link_context_download</source>
+                <target>Downloads</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_page">
+                <source>sidemenu.link_context_page</source>
+                <target>Pages</target>
+            </trans-unit>
+            <trans-unit id="link_upload_new">
+                <source>link_upload_new</source>
+                <target>Upload images</target>
+            </trans-unit>
+            <trans-unit id="link_upload_new_file">
+                <source>link_upload_new_file</source>
+                <target>Upload files</target>
+            </trans-unit>
+            <trans-unit id="link_list">
+                <source>link_list</source>
+                <target>Select images</target>
+            </trans-unit>
+            <trans-unit id="label_dropzone">
+                <source>label_dropzone</source>
+                <target>Drop the files here</target>
+            </trans-unit>
+            <trans-unit id="error.whitelist">
+                <source>error.whitelist</source>
+                <target>Unsupported file format.</target>
+            </trans-unit>
+			<trans-unit id="error.maxsize">
+				<source>error.maxsize</source>
+				<target>File size is too high.</target>
+			</trans-unit>
+        </body>
+    </file>
+</xliff>

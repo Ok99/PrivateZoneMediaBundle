@@ -1,0 +1,16 @@
+services:
+    sonata.core.form.type.media_collection:
+        class: Ok99\PrivateZoneCore\MediaBundle\Form\Type\MediaCollectionType
+        tags:
+            - { name: form.type, alias: ok99_privatezone_type_media_collection }
+        arguments: [@service_container]
+
+    sonata.core.form.type.image:
+        class: Ok99\PrivateZoneCore\MediaBundle\Form\Type\ImageType
+        tags:
+            - { name: form.type, alias: ok99_privatezone_type_image }
+
+    sonata.core.form.type.file:
+        class: Ok99\PrivateZoneCore\MediaBundle\Form\Type\FileType
+        tags:
+            - { name: form.type, alias: ok99_privatezone_type_file }

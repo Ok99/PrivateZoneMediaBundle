@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="cs" datatype="plaintext"  original="file.ext">
+        <body>
+            <trans-unit id="link_media">
+                <source>link_media</source>
+                <target>Přiložit soubor</target>
+            </trans-unit>
+            <trans-unit id="no_linked_media">
+                <source>no_linked_media</source>
+                <target>Není přiřazený soubor</target>
+            </trans-unit>
+            <trans-unit id="Binary Content">
+                <source>Binary Content</source>
+                <target>Soubor</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_default">
+                <source>sidemenu.link_context_default</source>
+                <target>Výchozí</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_promo">
+                <source>sidemenu.link_context_promo</source>
+                <target>Proma</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_news">
+                <source>sidemenu.link_context_news</source>
+                <target>Aktuality</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_user">
+                <source>sidemenu.link_context_user</source>
+                <target>Uživatelé</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_sonata_collection">
+                <source>sidemenu.link_context_sonata_collection</source>
+                <target>Kolekce</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_products">
+                <source>sidemenu.link_context_products</source>
+                <target>Produkty</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_lovochemie">
+                <source>sidemenu.link_context_lovochemie</source>
+                <target>Lovochemie</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_sonata_category">
+                <source>sidemenu.link_context_sonata_category</source>
+                <target>Kategorie</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_download">
+                <source>sidemenu.link_context_download</source>
+                <target>Ke stažení</target>
+            </trans-unit>
+            <trans-unit id="sidemenu.link_context_page">
+                <source>sidemenu.link_context_page</source>
+                <target>Stránky</target>
+            </trans-unit>
+            <trans-unit id="link_upload_new">
+                <source>link_upload_new</source>
+                <target>Nahrát obrázky</target>
+            </trans-unit>
+            <trans-unit id="link_upload_new_file">
+                <source>link_upload_new_file</source>
+                <target>Nahrát soubory</target>
+            </trans-unit>
+            <trans-unit id="link_list">
+                <source>link_list</source>
+                <target>Zvolit z nahraných</target>
+            </trans-unit>
+            <trans-unit id="label_dropzone">
+                <source>label_dropzone</source>
+                <target>Soubory můžete upustit zde</target>
+            </trans-unit>
+            <trans-unit id="error.whitelist">
+                <source>error.whitelist</source>
+                <target>Nepodporovaný formát souboru.</target>
+            </trans-unit>
+			<trans-unit id="error.maxsize">
+				<source>error.maxsize</source>
+				<target>Velikost souboru je příliš vysoká.</target>
+			</trans-unit>
+            <trans-unit id="Images">
+                <source>Images</source>
+                <target>Obrázky</target>
+            </trans-unit>
+            <trans-unit id="Gallery">
+                <source>Gallery</source>
+                <target>Galerie</target>
+            </trans-unit>
+            <trans-unit id="Options">
+                <source>Options</source>
+                <target>Nastavení</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

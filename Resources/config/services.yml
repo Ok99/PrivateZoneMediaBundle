@@ -1,0 +1,46 @@
+services:
+    ok99.privatezone.media.admin.media:
+      class: Ok99\PrivateZoneCore\MediaBundle\Admin\MediaAdmin
+      tags:
+        - { name: sonata.admin, manager_type: orm, group: Content, label: media }
+      arguments: [null, Ok99\PrivateZoneCore\MediaBundle\Entity\Media, Ok99PrivateZoneMediaBundle:MediaAdmin, @sonata.media.pool, @sonata.classification.manager.category, @sonata.classification.manager.context, @ok99.privatezone.site.pool]
+      calls:
+        - [ setModelManager, [@sonata.media.admin.media.manager] ]
+        - [ setTranslationDomain, [%sonata.media.admin.media.translation_domain%] ]
+        - [ setTemplates, [{inner_list_row: SonataMediaBundle:MediaAdmin:inner_row_media.html.twig, base_list_field: SonataAdminBundle:CRUD:base_list_flat_field.html.twig, list: SonataMediaBundle:MediaAdmin:list.html.twig, edit: SonataMediaBundle:MediaAdmin:edit.html.twig, ,outer_list_rows_mosaic: Ok99PrivateZoneMediaBundle:MediaAdmin:list_outer_rows_mosaic.html.twig, delete: Ok99PrivateZoneMediaBundle:MediaAdmin:delete.html.twig}] ]
+
+    ok99.privatezone.media.admin.gallery:
+      class: Ok99\PrivateZoneCore\MediaBundle\Admin\GalleryAdmin
+      tags:
+        - { name: sonata.admin, manager_type: orm, group: Content, label: galleries }
+      arguments: [null, Ok99\PrivateZoneCore\MediaBundle\Entity\Gallery,Ok99PrivateZoneMediaBundle:GalleryAdmin, @sonata.media.pool, @ok99.privatezone.site.pool]
+      calls:
+        - [ setTranslationDomain, [%sonata.media.admin.media.translation_domain%] ]
+        - [ setTemplates, [{list: Ok99PrivateZoneMediaBundle:GalleryAdmin:list.html.twig}] ]
+
+    ok99.privatezone.media.admin.galleryhasmedia:
+      class: Ok99\PrivateZoneCore\MediaBundle\Admin\GalleryHasMediaAdmin
+      tags:
+        - { name: sonata.admin, manager_type: orm, audit: false, group: Content, label: gallery_medias }
+      arguments: [null, Ok99\PrivateZoneCore\MediaBundle\Entity\GalleryHasMedia, null, @sonata.media.pool]
+
+    ok99.privatezone.admin.upload_listener:
+        class: Ok99\PrivateZoneCore\MediaBundle\Listener\UploadListener
+        tags:
+            - { name: kernel.event_listener, event: oneup_uploader.post_persist, method: onUpload }
+        arguments: [ @sonata.media.manager.media, @sonata.media.pool, @sonata.classification.manager.category, @service_container ]
+
+    ok99.privatezone.upload.error_handler:
+      class: Ok99\PrivateZoneCore\MediaBundle\Uploader\ErrorHandler\UploaderErrorHandler
+      arguments: [ @translator ]
+
+    ok99.privatezone.media.twig.extension:
+        class: Ok99\PrivateZoneCore\MediaBundle\Twig\Extension\MediaExtension
+        arguments: [@sonata.media.pool, @sonata.media.manager.media, @router]
+        tags:
+            - { name: twig.extension }
+
+    ok99.privatezone.media.formatter.twig:
+        class: Ok99\PrivateZoneCore\MediaBundle\Twig\Extension\FormatterMediaExtension
+        arguments: [@ok99.privatezone.media.twig.extension]
+

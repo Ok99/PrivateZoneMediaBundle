@@ -1,0 +1,62 @@
+{% extends 'SonataAdminBundle:CRUD:base_list.html.twig' %}
+
+{% import _self as tree %}
+{% macro navigate_child(collection, admin, root, current_category, depth) %}
+    {% if root and collection|length == 0 %}
+        <div>
+            <p class="bg-warning">{{ admin.trans('warning_no_category', {}, admin.translationdomain) }}</p>
+        </div>
+    {% endif %}
+    <ul{% if root %} class="sonata-tree sonata-tree--small js-treeview sonata-tree--toggleable"{% endif %} style="display:block">
+        {% for element in collection %}
+            <li>
+                <div class="sonata-tree__item{% if element.id == current_category %} is-active{% endif %} is-toggled" data-treeview-toggled>
+                    {% if element.parent or root %}<i class="fa fa-caret-right" data-treeview-toggler></i>{% endif %}
+                    <a class="sonata-tree__item__edit" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({category: element.id})) }}">{{ element.name }}</a>
+                </div>
+
+                {% if element.children|length %}
+                    {{ _self.navigate_child(element.children, admin, false, current_category, depth + 1) }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% block navbar_title %}
+    {{ admin.trans(admin.label, {}, admin.translationdomain) }}
+    {#<div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <strong class="text-info">{{ currentSite.name }}</strong> <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            {% for site in sites %}
+                <li>
+                    <a href="{{ admin.generateUrl('list', { 'site': site.id }) }}">
+                        {{ site.name }}
+                        {% if currentSite and site.id == currentSite.id %}
+                            <span class="pull-right">
+                                    <i class="fa fa-check"></i>
+                                </span>
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor%}
+        </ul>
+    </div>#}
+{% endblock %}
+
+{% block list_table %}
+    {# tab_menu block is not rendered for xhr requests by default so we render it manually #}
+    {% if app.request.xmlHttpRequest %}
+        <div class="col-xs-12">
+            {{ block('tab_menu')|raw }}
+        </div>
+    {% endif %}
+    <div class="col-xs-6 col-md-3">
+        {{ tree.navigate_child([root_category], admin, true, datagrid.values['category']['value'], 1) }}
+    </div>
+    <div class="col-xs-12 col-md-9">
+        {{ parent() }}
+    </div>
+{% endblock %}

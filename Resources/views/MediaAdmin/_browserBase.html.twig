@@ -1,0 +1,53 @@
+{# this template contains markup used in both pages and browser templates #}
+{% extends base_template %}
+
+{% set ckParameters = {'CKEditor': app.request.get('CKEditor'), 'CKEditorFuncNum': app.request.get('CKEditorFuncNum'), 'linkTo': linkTo} %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(function () {
+            $(".select").click(function (e) {
+                e.preventDefault();
+                window.opener.CKEDITOR.tools.callFunction({{ app.request.get('CKEditorFuncNum')|escape('js') }}, $(this).attr("href"));
+
+                // TODO better to rewrite CKEditor handler function to recognize link '{ path(..) }' as type <other>
+                // set protocol if specified
+                var protocol = $(this).data('protocol');
+                if (protocol !== undefined) {
+                    window.opener.CKEDITOR.dialog.getCurrent().setValueOf('info', 'protocol', protocol);
+                }
+
+                // close media window
+                window.close();
+            });
+        });
+    </script>
+{% endblock %}
+
+
+{% block preview %}
+    <div class="box box-primary">
+        <div class="box-body row">
+            <div class="dropdown col-xs-12 col-md-3">
+                <strong>{{ "label.select_link_type"|trans({}, 'SonataMediaBundle') }}</strong>
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownLinkTo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    {{ ('label.link_to_' ~ linkTo)|trans({}, 'SonataMediaBundle') }}
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownLinkTo">
+                    <li>
+                        <a href="{{ admin.generateUrl('browser', ckParameters|merge({'linkTo': 'page'})) }}">{{ 'label.link_to_page'|trans({}, 'SonataMediaBundle') }}</a>
+                        <a href="{{ admin.generateUrl('browser', ckParameters|merge({'linkTo': 'media'})) }}">{{ 'label.link_to_media'|trans({}, 'SonataMediaBundle') }}</a>
+                    </li>
+                </ul>
+            </div>
+            {% block preview_additional_menu %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block list_filters %}{% endblock %}

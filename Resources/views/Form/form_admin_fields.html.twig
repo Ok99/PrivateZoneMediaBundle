@@ -1,0 +1,211 @@
+{% extends 'SonataAdminBundle:Form:form_admin_fields.html.twig' %}
+
+{% block ok99_privatezone_type_media_collection_widget %}
+    {% if sonata_admin.field_description.hasassociationadmin %}
+        <div id="field_container_{{ id }}" class="field-container">
+            <span class="dropzone"><i class="fa fa-upload"></i> {{ 'label_dropzone'|trans({}, btn_catalogue) }}</span>
+            <span id="field_widget_{{ id }}" >
+                <div class="image-gallery clearfix">
+                    {% for nested_group_field_name, nested_group_field in form.children %}
+                        <div class="image-item">
+                            {% for field_name, nested_field in nested_group_field.children %}
+                                {% if field_name != '_delete' %}
+                                    {{ form_widget(nested_field) }}
+                                {% endif %}
+                            {% endfor %}
+                            {# % if nested_group_field.children['_delete'] is defined %}
+                                <div class="image-actions">
+                                    {{ form_widget(nested_group_field.children['_delete']) }}
+                                    {{ form_label(nested_group_field.children['_delete']) }}
+                                </div>
+                            {% endif % #}
+                        </div>
+                    {% endfor %}
+                </div>
+            </span>
+
+            {% if sonata_admin.field_description.associationadmin.hasroute('create') and sonata_admin.field_description.associationadmin.isGranted('CREATE') and (btn_upload_new or btn_upload_new_file) and btn_list %}
+                <span id="field_actions_{{ id }}" class="field_actions">
+                    {% if form.vars.media_type == 'image' %}
+                        <span class="btn btn-success btn-sm btn-outline sonata-ba-action" title="{{ btn_upload_new|trans({}, btn_catalogue) }}" style="position:relative">
+                            <i class="fa fa-upload"></i>
+                            <span>{{ btn_upload_new|trans({}, btn_catalogue) }}</span>
+                            <input id="{{ id }}_files" type="file" name="{{ id }}_files[]" data-url="{{ oneup_uploader_endpoint('media_image') }}" multiple="multiple" style="position:absolute;top:0;right:0;opacity:0;left:0;bottom:0;cursor:pointer;width:100%;" />
+                        </span>
+                    {% else %}
+                        <span class="btn btn-success btn-sm btn-outline sonata-ba-action" title="{{ btn_upload_new_file|trans({}, btn_catalogue) }}" style="position:relative">
+                            <i class="fa fa-upload"></i>
+                            <span>{{ btn_upload_new_file|trans({}, btn_catalogue) }}</span>
+                            <input id="{{ id }}_files" type="file" name="{{ id }}_files[]" data-url="{{ oneup_uploader_endpoint('media_file') }}" multiple="multiple" style="position:absolute;top:0;right:0;opacity:0;left:0;bottom:0;cursor:pointer;width:100%;" />
+                        </span>
+                    {% endif %}
+                    <a  href="{{ media_admin.generateUrl('list', sonata_admin.field_description.getOption('link_parameters', {})) }}"
+                        onclick="return start_field_dialog_form_list_{{ id }}(this);"
+                        class="btn btn-info btn-sm btn-outline sonata-ba-action"
+                        title="{{ btn_list|trans({}, btn_catalogue) }}"
+                            >
+                        <i class="fa fa-list"></i>
+                        {{ btn_list|trans({}, btn_catalogue) }}
+                    </a>
+                    <img src="/bundles/ok99privatezonemedia/img/ajax-loader.gif" alt="" class="loading" />
+                </span>
+                <script type="text/javascript">
+                    $(document).ready(function() {
+                        $('#{{ id }}_files').fileupload({
+                            dataType: 'json',
+                            done: function (e, data) {
+                                if (data.result.error === undefined) {
+                                    add_field_item_{{ id }}(data.result.id, data.result.name, data.result.url, data.result.contentType, data.result.mediaType);
+                                } else {
+                                    jQuery("#field_actions_{{ id }}").before('<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button><p>' + data.result.error + '</p></div>');
+                                }
+                            },
+                            dragover: function(e) {
+                                var dropZone = $('#field_container_{{ id }}'),
+                                    timeout = window.dropZoneTimeout;
+                                if (!timeout) {
+                                    dropZone.addClass('dragover');
+                                } else {
+                                    clearTimeout(timeout);
+                                }
+                                var found = false,
+                                    node = e.target;
+                                do {
+                                    if (node === dropZone[0]) {
+                                        found = true;
+                                        break;
+                                    }
+                                    node = node.parentNode;
+                                } while (node != null);
+                                if (found) {
+                                    dropZone.addClass('dragover');
+                                } else {
+                                    dropZone.removeClass('dragover');
+                                }
+                                window.dropZoneTimeout = setTimeout(function () {
+                                    window.dropZoneTimeout = null;
+                                    dropZone.removeClass('dragover');
+                                }, 100);
+                            },
+                            drop: function (e) {
+                                $('#field_container_{{ id }}').removeClass('dragover');
+                            },
+                            dropZone: $('#field_container_{{ id }}'),
+                            formData: {
+                                context: '{{ context }}',
+                                {% if category is defined and category -%}
+                                    category: '{{ category }}',
+                                {% endif -%}
+                                mediaType: '{{ media_type }}'
+                            },
+                            progressall: function (e) {
+                                $('#field_container_{{ id }}').find('.loading').show();
+                            },
+                            stop: function (e) {
+                                $('#field_container_{{ id }}').find('.loading').hide();
+                            }
+                        });
+
+                        $('.image-box-close').hide().on('click', function(e) {
+                            $(this).parents('.image-item').remove();
+                            e.preventDefault();
+                        });
+                        $('.image-box').on('mouseenter', function() {
+                            $('.image-box-close', this).show();
+                        }).on('mouseleave', function() {
+                            $('.image-box-close', this).hide();
+                        });
+                    });
+                </script>
+            {% endif %}
+
+            {# add code for the sortable options #}
+            {% if sonata_admin.field_description.options.sortable is defined %}
+                <script type="text/javascript">
+                    jQuery('div#field_container_{{ id }} .image-gallery').sortable({
+                        opacity: 0.6,
+                        items: '> .image-item',
+                        stop: apply_position_value_{{ id }}
+                    });
+
+                    function apply_position_value_{{ id }}() {
+                        jQuery('div#field_container_{{ id }} .image-item > input[type=hidden]').each(function(index, value) {
+                            jQuery(value).val(index + 1);
+                        });
+                    }
+
+                    // refresh the sortable option when a new element is added
+                    jQuery('#sonata-ba-field-container-{{ id }}').bind('sonata.add_element', function() {
+                        apply_position_value_{{ id }}();
+                        jQuery('div#field_container_{{ id }} .image-gallery').sortable('refresh');
+                    });
+
+                    apply_position_value_{{ id }}();
+
+                </script>
+            {% endif %}
+
+            {% include 'SonataDoctrineORMAdminBundle:CRUD:edit_modal.html.twig' %}
+
+            {% include 'Ok99PrivateZoneMediaBundle:CRUD:edit_orm_media_association_script.html.twig' %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+{% block ok99_privatezone_type_image_widget %}
+    <div id="field_container_{{ id }}" class="field-container image-box">
+        <span id="field_actions_{{ id }}" class="field-actions">
+            <span id="field_widget_{{ id }}" class="field-short-description">
+                <a class="btn btn-xs btn-danger image-box-close" href="#"><i class="fa fa-2x fa-trash"></i></a>
+                {% if sonata_admin.field_description.associationadmin.id(sonata_admin.value) %}
+                    {% thumbnail sonata_admin.value, 'cms' %}
+                {% elseif sonata_admin.field_description.options.placeholder is defined and sonata_admin.field_description.options.placeholder %}
+                    <span class="inner-field-short-description">
+                        {{ sonata_admin.field_description.options.placeholder|trans({}, 'SonataAdminBundle') }}
+                    </span>
+                {% endif %}
+            </span>
+        </span>
+
+        {{ form_widget(form, {'required':false}) }}
+    </div>
+
+    {#% include 'SonataDoctrineORMAdminBundle:CRUD:edit_orm_many_association_script.html.twig' %#}
+{% endblock %}
+{% block ok99_privatezone_type_file_widget %}
+    <div id="field_container_{{ id }}" class="field-container image-box file_widget-box">
+        <span id="field_actions_{{ id }}" class="field-actions">
+            <span id="field_widget_{{ id }}" class="field-short-description">
+                <a class="btn btn-xs btn-danger image-box-close" href="#"><i class="fa fa-trash fa-2x"></i></a>
+                {% if sonata_admin.field_description.associationadmin.id(sonata_admin.value) %}
+                    {% if sonata_admin.value.contentType == "application/pdf" %}
+                        <a class="file_widget" href="{{ sonata_admin.field_description.associationadmin.generateObjectUrl('edit', sonata_admin.value) }}"><i class="fa fa-file-pdf-o fa-4x"></i><br>{{ sonata_admin.value.name }}</a>
+                    {% elseif sonata_admin.value.contentType == "application/excel" or sonata_admin.value.contentType == "application/vnd.ms-excel" or sonata_admin.value.contentType == "application/x-excel" %}
+                        <a class="file_widget" href="{{ sonata_admin.field_description.associationadmin.generateObjectUrl('edit', sonata_admin.value) }}"><i class="fa fa-file-excel-o fa-4x"></i><br>{{ sonata_admin.value.name }}</a>
+                    {% elseif sonata_admin.value.contentType == "application/msword" %}
+                        <a class="file_widget" href="{{ sonata_admin.field_description.associationadmin.generateObjectUrl('edit', sonata_admin.value) }}"><i class="fa fa-file-word-o fa-4x"></i><br>{{ sonata_admin.value.name }}</a>
+                    {% elseif sonata_admin.value.contentType == "application/mspowerpoint" or sonata_admin.value.contentType == "application/vnd.ms-powerpoint" or sonata_admin.value.contentType == "application/x-mspowerpoint" %}
+                        <a class="file_widget" href="{{ sonata_admin.field_description.associationadmin.generateObjectUrl('edit', sonata_admin.value) }}"><i class="fa fa-file-powerpoint-o fa-4x"></i><br>{{ sonata_admin.value.name }}</a>
+                    {% elseif sonata_admin.value.contentType == "application/x-compressed" or sonata_admin.value.contentType == "application/zip" %}
+                        <a class="file_widget" href="{{ sonata_admin.field_description.associationadmin.generateObjectUrl('edit', sonata_admin.value) }}"><i class="fa fa-file-archive-o fa-4x"></i><br>{{ sonata_admin.value.name }}</a>
+                    {% elseif sonata_admin.value.contentType == "image/gif" or sonata_admin.value.contentType == "image/jpeg" or sonata_admin.value.contentType == "image/png" %}
+                        <a class="file_widget" href="{{ sonata_admin.field_description.associationadmin.generateObjectUrl('edit', sonata_admin.value) }}"><i class="fa fa-file-image-o fa-4x"></i><br>{{ sonata_admin.value.name }}</a>
+                    {% elseif sonata_admin.value.contentType == "video/avi" or sonata_admin.value.contentType == "video/mpeg" or sonata_admin.value.contentType == "video/mp4" or sonata_admin.value.contentType == "video/x-flv" or sonata_admin.value.contentType == "video/quicktime" or sonata_admin.value.contentType == "video/x-ms-wmv" %}
+                        <a class="file_widget" href="{{ sonata_admin.field_description.associationadmin.generateObjectUrl('edit', sonata_admin.value) }}"><i class="fa fa-file-video-o fa-4x"></i><br>{{ sonata_admin.value.name }}</a>
+                    {% else %}
+                        <a class="file_widget" href="{{ sonata_admin.field_description.associationadmin.generateObjectUrl('edit', sonata_admin.value) }}"><i class="fa fa-file-o fa-4x"></i><br>{{ sonata_admin.value.name }}</a>
+                    {% endif %}
+                {% elseif sonata_admin.field_description.options.placeholder is defined and sonata_admin.field_description.options.placeholder %}
+                    <span class="inner-field-short-description">
+                        {{ sonata_admin.field_description.options.placeholder|trans({}, 'SonataAdminBundle') }}
+                    </span>
+                {% endif %}
+            </span>
+        </span>
+
+        {{ form_widget(form, {'required':false}) }}
+    </div>
+
+    {#% include 'SonataDoctrineORMAdminBundle:CRUD:edit_orm_many_association_script.html.twig' %#}
+{% endblock %}
