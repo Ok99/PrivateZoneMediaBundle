@@ -2,6 +2,7 @@
 
 namespace Ok99\PrivateZoneCore\MediaBundle\Listener;
 
+use Ok99\PrivateZoneBundle\Entity\EmailAttachment;
 use Oneup\UploaderBundle\Event\PostPersistEvent;
 use Sonata\MediaBundle\Model\MediaManagerInterface;
 use Sonata\ClassificationBundle\Model\CategoryManagerInterface;
@@ -35,6 +36,9 @@ class UploadListener
         switch($event->getType()) {
             case 'media_user_image':
                 $this->userProfileUpload($event);
+                break;
+            case 'media_email_attachment':
+                $this->emailAttachmentUpload($event);
                 break;
             default:
                 $this->standardUpload($event);
@@ -149,6 +153,98 @@ class UploadListener
 
             $response = $event->getResponse();
             $response['pathname'] = $relativePathname;
+        }
+    }
+
+    protected function emailAttachmentUpload(PostPersistEvent $event)
+    {
+        $request = $event->getRequest();
+        $entityManager = $this->container->get('doctrine.orm.default_entity_manager');
+
+        /** @var File $file */
+        $file = $event->getFile();
+
+        $filename = $file->getFilename();
+
+        //TODO - improve the retrieval of the file name
+        if(is_array(current($request->files)) && is_array(current(current($request->files)))) {
+            $filename = current(current($request->files))[0]->getClientOriginalName();
+        }
+
+        $basename = substr($filename, 0, strrpos($filename, '.'));
+        $extension = $file->getExtension();
+        $path = $file->getPath();
+        $pathname = sprintf('%s/%s', $path, $filename);
+
+        $file->move($path, $filename);
+
+        if (file_exists($pathname)) {
+            $relativePathname = sprintf('/uploads/%s/%s', $event->getType(), $filename);
+
+            if (function_exists('finfo_file')) {
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->file($pathname);
+            } else {
+                $mimeType = mime_content_type($pathname);
+            }
+
+            $attachment = new EmailAttachment();
+            $attachment->setCode(uniqid());
+            $attachment->setPath($relativePathname);
+            $attachment->setSize(filesize($pathname));
+            $attachment->setMimetype($mimeType);
+
+            switch($extension) {
+                case 'jpg':
+                case 'jpeg':
+                case 'png':
+                case 'gif':
+                case 'bmp':
+                    $attachment->setIcon('image');
+                    break;
+                case 'doc':
+                case 'docx':
+                    $attachment->setIcon('word');
+                    break;
+                case 'xls':
+                case 'xlsx':
+                    $attachment->setIcon('excel');
+                    break;
+                case 'pwt':
+                case 'pwtx':
+                    $attachment->setIcon('powerpoint');
+                    break;
+                case 'pdf':
+                    $attachment->setIcon('pdf');
+                    break;
+                case 'txt':
+                case 'rtf':
+                    $attachment->setIcon('text');
+                    break;
+                case 'mpg':
+                case 'mpeg':
+                case 'avi':
+                case 'mov':
+                    $attachment->setIcon('video');
+                    break;
+                case 'zip':
+                case 'rar':
+                    $attachment->setIcon('archive');
+                    break;
+                default:
+                    $attachment->setIcon('file');
+            }
+
+            $entityManager->persist($attachment);
+            $entityManager->flush($attachment);
+
+            $response = $event->getResponse();
+            $response['id'] = $attachment->getId();
+            $response['code'] = $attachment->getCode();
+            $response['icon'] = $attachment->getIcon();
+            $response['size'] = $attachment->getSizeDecorated();
+            $response['pathname'] = $relativePathname;
+            $response['filename'] = $filename;
         }
     }
 
