@@ -2,6 +2,7 @@
 
 namespace Ok99\PrivateZoneCore\MediaBundle\Listener;
 
+use Behat\Behat\Util\Transliterator;
 use Ok99\PrivateZoneBundle\Entity\EmailAttachment;
 use Oneup\UploaderBundle\Event\PostPersistEvent;
 use Sonata\MediaBundle\Model\MediaManagerInterface;
@@ -169,9 +170,9 @@ class UploadListener
         //TODO - improve the retrieval of the file name
         if(is_array(current($request->files)) && is_array(current(current($request->files)))) {
             $filename = current(current($request->files))[0]->getClientOriginalName();
+            $filename = Transliterator::urlize($filename);
         }
 
-        $basename = substr($filename, 0, strrpos($filename, '.'));
         $extension = $file->getExtension();
         $path = $file->getPath();
         $pathname = sprintf('%s/%s', $path, $filename);
