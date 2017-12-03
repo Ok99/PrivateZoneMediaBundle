@@ -101,7 +101,8 @@ class UploadListener
         $file = $event->getFile();
 
         /** @var User $user */
-        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+        $userId = $this->container->get('request_stack')->getCurrentRequest()->getSession()->get(User::ID_HANDLER);
+        $user = $this->container->get('doctrine.orm.entity_manager')->getRepository('Ok99PrivateZoneUserBundle:User')->find($userId);
 
         $context = $request->get('context');
 
