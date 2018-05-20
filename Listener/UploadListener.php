@@ -168,10 +168,14 @@ class UploadListener
 
         $filename = $file->getFilename();
 
-        //TODO - improve the retrieval of the file name
-        if(is_array(current($request->files)) && is_array(current(current($request->files)))) {
+        if (is_array(current($request->files)) && is_array(current(current($request->files)))) {
             $filename = current(current($request->files))[0]->getClientOriginalName();
-            $filename = Transliterator::urlize($filename);
+            $pathinfo = pathinfo($filename);
+            $filename = sprintf(
+                '%s.%s',
+                Transliterator::urlize($pathinfo['filename']),
+                $pathinfo['extension']
+            );
         }
 
         $extension = $file->getExtension();
