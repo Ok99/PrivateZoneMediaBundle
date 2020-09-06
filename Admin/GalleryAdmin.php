@@ -36,7 +36,7 @@ class GalleryAdmin extends BaseAdmin
         $formMapper
             ->with('General')
             ->add('enabled', null, array('required' => false))
-            ->add('translations', 'ok99_privatezone_translations', array(
+            ->add('translations', 'canabelle_cms_translations', array(
                 'translation_domain' => $this->translationDomain,
                 'label' => false,
                 'fields' => array(
