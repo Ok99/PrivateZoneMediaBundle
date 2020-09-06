@@ -2,6 +2,7 @@
 
 namespace Ok99\PrivateZoneCore\MediaBundle\Entity;
 
+use Ok99\PrivateZoneCore\UserBundle\Entity\User;
 use Sonata\MediaBundle\Entity\BaseMedia as BaseMedia;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -40,11 +41,20 @@ class Media extends BaseMedia
     protected $category;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Ok99\PrivateZoneCore\UserBundle\Entity\User")
+     * @ORM\JoinTable(name="media__media__users",
+     *      joinColumns={@ORM\JoinColumn(name="media__media__id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="RESTRICT")})
+     */
+    private $allowedUsers;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->galleryHasMedias = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->allowedUsers = new \Doctrine\Common\Collections\ArrayCollection();
         $this->enabled = true;
     }
 
@@ -114,4 +124,41 @@ class Media extends BaseMedia
         return $this->lang;
     }
 
+    /**
+     * Add allowedUser
+     *
+     * @param \Ok99\PrivateZoneCore\UserBundle\Entity\User $allowedUser
+     * @return Media
+     */
+    public function addAllowedUser(\Ok99\PrivateZoneCore\UserBundle\Entity\User $allowedUser)
+    {
+        $this->allowedUsers[] = $allowedUser;
+
+        return $this;
+    }
+
+    /**
+     * Remove allowedUser
+     *
+     * @param \Ok99\PrivateZoneCore\UserBundle\Entity\User $allowedUser
+     */
+    public function removeAllowedUser(\Ok99\PrivateZoneCore\UserBundle\Entity\User $allowedUser)
+    {
+        $this->allowedUsers->removeElement($allowedUser);
+    }
+
+    /**
+     * Get allowedUsers
+     *
+     * @return User[]|\Doctrine\Common\Collections\Collection
+     */
+    public function getAllowedUsers()
+    {
+        $allowedUsers = $this->allowedUsers->getValues();
+
+        $collator = new \Collator('cs_CZ');
+        $collator->sort($allowedUsers);
+
+        return $allowedUsers;
+    }
 }
