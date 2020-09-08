@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Ok99\PrivateZoneCore\ClassificationBundle\Entity\Category;
 use Ok99\PrivateZoneCore\MediaBundle\Entity\Media;
+use Ok99\PrivateZoneCore\UserBundle\Entity\User;
 
 /**
  * MediaRepository
@@ -17,12 +18,13 @@ class MediaRepository extends EntityRepository
 {
     /**
      * @param Category $category
+     * @param User|null $user
      * @return Media[]
      */
-    public function getCategoryMedias(Category $category)
+    public function getCategoryMedias(Category $category, $user = null)
     {
         try {
-            return $this->createQueryBuilder('m')
+            $medias = $this->createQueryBuilder('m')
                 ->where('m.category = :category')
                 ->andWhere('m.enabled = :true')
                 ->orderBy('m.updatedAt', 'desc')
@@ -30,7 +32,44 @@ class MediaRepository extends EntityRepository
                 ->setParameter('true', true)
                 ->getQuery()->getResult();
         } catch (NoResultException $e) {
-            return [];
+            $medias = [];
         }
+
+        if ($user) {
+            $medias = array_filter($medias, function (Media $media) use ($user) {
+                return
+                    !$media->getAllowedUsers()
+                    || in_array($user, $media->getAllowedUsers());
+            });
+        }
+
+        return $medias;
+    }
+
+    /**
+     * @param User|null $user
+     * @return Media[]
+     */
+    public function getMedias($user = null)
+    {
+        try {
+            $medias = $this->createQueryBuilder('m')
+                ->andWhere('m.enabled = :true')
+                ->orderBy('m.updatedAt', 'desc')
+                ->setParameter('true', true)
+                ->getQuery()->getResult();
+        } catch (NoResultException $e) {
+            $medias = [];
+        }
+
+        if ($user) {
+            $medias = array_filter($medias, function (Media $media) use ($user) {
+                return
+                    !$media->getAllowedUsers()
+                    || in_array($user, $media->getAllowedUsers());
+            });
+        }
+
+        return $medias;
     }
 }

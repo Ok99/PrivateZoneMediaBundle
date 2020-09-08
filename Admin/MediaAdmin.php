@@ -275,6 +275,8 @@ class MediaAdmin extends \Sonata\MediaBundle\Admin\ORM\MediaAdmin
     public function isAdmin($object = null)
     {
         return ($object ? $this->isGranted('ADMIN', $object) : $this->isGranted('ADMIN'))
-            || $this->isGranted('ROLE_OK99_PRIVATEZONE_MEDIA_ADMIN_MEDIA_ADMIN');
+            || $this->isGranted('ROLE_OK99_PRIVATEZONE_MEDIA_ADMIN_MEDIA_ADMIN')
+            || $this->isGranted('ROLE_SUPER_ADMIN')
+        ;
     }
 }

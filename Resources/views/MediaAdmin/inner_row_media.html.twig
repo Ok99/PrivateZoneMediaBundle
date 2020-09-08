@@ -50,6 +50,15 @@ file that was distributed with this source code.
 								<br />
 							{% endif %}
 							{{ 'list.label_createdAt'|trans({}, 'SonataMediaBundle') }}: {{ object.updatedAt|date('j. n. Y H:i') }}
+							{% if object.allowedUsers is defined %}
+								<br/>
+								{{ 'allowed_users_list_label'|trans({}, 'Ok99PrivateZoneBundle') }}:
+								{% if object.allowedUsers and object.allowedUsers|length > 0 %}
+									{{ object.allowedUsers|join(', ') }}
+								{% else %}
+									{{ 'allowed_to_all_users_list_label'|trans({}, 'Ok99PrivateZoneBundle') }}
+								{% endif %}
+							{% endif %}
 							<br />
 							{{ 'list.label_enabled'|trans({}, 'SonataMediaBundle') }}: {{ (object.enabled ? 'list.enabled_yes' : 'list.enabled_no')|trans({}, 'SonataMediaBundle') }}
 							{% if object.providerName == 'sonata.media.provider.image' %}
