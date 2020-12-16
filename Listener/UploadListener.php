@@ -3,6 +3,7 @@
 namespace Ok99\PrivateZoneCore\MediaBundle\Listener;
 
 use Behat\Behat\Util\Transliterator;
+use Ok99\PrivateZoneBundle\Entity\Attachment;
 use Ok99\PrivateZoneBundle\Entity\EmailAttachment;
 use Oneup\UploaderBundle\Event\PostPersistEvent;
 use Sonata\MediaBundle\Model\MediaManagerInterface;
@@ -12,18 +13,28 @@ use Ok99\PrivateZoneCore\MediaBundle\Entity\Media;
 use Ok99\PrivateZoneCore\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\Request;
 
 class UploadListener
 {
+    /** @var MediaManagerInterface */
     private $manager;
 
+    /** @var CategoryManagerInterface */
     private $categoryManager;
 
+    /** @var Pool */
     private $pool;
 
+    /** @var ContainerInterface */
     private $container;
 
+    /**
+     * UploadListener constructor.
+     * @param MediaManagerInterface $manager
+     * @param Pool $pool
+     * @param CategoryManagerInterface $categoryManager
+     * @param ContainerInterface $container
+     */
     public function __construct(MediaManagerInterface $manager, Pool $pool, CategoryManagerInterface $categoryManager, ContainerInterface $container)
     {
         $this->manager = $manager;
@@ -32,11 +43,17 @@ class UploadListener
         $this->container = $container;
     }
 
+    /**
+     * @param PostPersistEvent $event
+     */
     public function onUpload(PostPersistEvent $event)
     {
         switch($event->getType()) {
             case 'media_user_image':
                 $this->userProfileUpload($event);
+                break;
+            case 'media_attachment':
+                $this->attachmentUpload($event);
                 break;
             case 'media_email_attachment':
                 $this->emailAttachmentUpload($event);
@@ -46,6 +63,9 @@ class UploadListener
         }
     }
 
+    /**
+     * @param PostPersistEvent $event
+     */
     protected function standardUpload(PostPersistEvent $event)
     {
         $request = $event->getRequest();
@@ -158,7 +178,11 @@ class UploadListener
         }
     }
 
-    protected function emailAttachmentUpload(PostPersistEvent $event)
+    /**
+     * @param PostPersistEvent $event
+     * @param string|null $className
+     */
+    protected function attachmentUpload(PostPersistEvent $event, $className = null)
     {
         $request = $event->getRequest();
         $entityManager = $this->container->get('doctrine.orm.default_entity_manager');
@@ -166,25 +190,40 @@ class UploadListener
         /** @var File $file */
         $file = $event->getFile();
 
+        $path = $file->getPath();
         $filename = $file->getFilename();
+        $extension = $file->getExtension();
 
         if (is_array(current($request->files)) && is_array(current(current($request->files)))) {
             $filename = current(current($request->files))[0]->getClientOriginalName();
+
             $pathinfo = pathinfo($filename);
+            $baseFilename = Transliterator::urlize($pathinfo['filename']);
+
             $filename = sprintf(
                 '%s.%s',
-                Transliterator::urlize($pathinfo['filename']),
+                $baseFilename,
                 $pathinfo['extension']
             );
+
+            $filenameIndex = 0;
+            while (file_exists(sprintf('%s/%s', $path, $filename))) {
+                $filename = sprintf(
+                    '%s_%s.%s',
+                    $baseFilename,
+                    ++$filenameIndex,
+                    $pathinfo['extension']
+                );
+            }
         }
 
-        $extension = $file->getExtension();
-        $path = $file->getPath();
+        $file->move($path, $filename);
         $pathname = sprintf('%s/%s', $path, $filename);
 
-        $file->move($path, $filename);
-
         if (file_exists($pathname)) {
+            /** @var User $user */
+            $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
             $relativePathname = sprintf('/uploads/%s/%s', $event->getType(), $filename);
 
             if (function_exists('finfo_file')) {
@@ -194,7 +233,12 @@ class UploadListener
                 $mimeType = mime_content_type($pathname);
             }
 
-            $attachment = new EmailAttachment();
+            if ($className) {
+                $attachment = new $className();
+            } else {
+                $attachment = new Attachment();
+            }
+
             $attachment->setCode(uniqid());
             $attachment->setPath($relativePathname);
             $attachment->setSize(filesize($pathname));
@@ -241,6 +285,9 @@ class UploadListener
                     $attachment->setIcon('file');
             }
 
+            $attachment->setCreatedBy($user);
+            $attachment->setUpdatedBy($user);
+
             $entityManager->persist($attachment);
             $entityManager->flush($attachment);
 
@@ -252,6 +299,14 @@ class UploadListener
             $response['pathname'] = $relativePathname;
             $response['filename'] = $filename;
         }
+    }
+
+    /**
+     * @param PostPersistEvent $event
+     */
+    protected function emailAttachmentUpload(PostPersistEvent $event)
+    {
+        $this->attachmentUpload($event, EmailAttachment::class);
     }
 
     /**
