@@ -12,7 +12,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Media extends BaseMedia
 {
-
     /**
      * @var integer $id
      * @ORM\Column(type="integer")
@@ -47,6 +46,22 @@ class Media extends BaseMedia
      *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="RESTRICT")})
      */
     private $allowedUsers;
+
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Ok99\PrivateZoneCore\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="created_by_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    private $createdBy;
+
+    /**
+     * @var integer
+     *
+     * @ORM\ManyToOne(targetEntity="Ok99\PrivateZoneCore\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="updated_by_id", referencedColumnName="id", onDelete="SET NULL", nullable=true)
+     */
+    private $updatedBy;
 
     /**
      * Constructor
@@ -156,9 +171,57 @@ class Media extends BaseMedia
     {
         $allowedUsers = $this->allowedUsers->getValues();
 
-        $collator = new \Collator('cs_CZ');
-        $collator->sort($allowedUsers);
+        if ($allowedUsers) {
+            $collator = new \Collator('cs_CZ');
+            $collator->sort($allowedUsers);
+        }
 
         return $allowedUsers;
+    }
+
+    /**
+     * Set createdBy
+     *
+     * @param User|null $createdBy
+     * @return Media
+     */
+    public function setCreatedBy(User $createdBy = null)
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    /**
+     * Get createdBy
+     *
+     * @return User|int
+     */
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * Set updatedBy
+     *
+     * @param User|null $updatedBy
+     * @return Media
+     */
+    public function setUpdatedBy(User $updatedBy = null)
+    {
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedBy
+     *
+     * @return User|int
+     */
+    public function getUpdatedBy()
+    {
+        return $this->updatedBy;
     }
 }
