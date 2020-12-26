@@ -48,6 +48,20 @@ class Media extends BaseMedia
     private $allowedUsers;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_notifiable", type="boolean")
+     */
+    private $isNotifiable = true;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="notification_sent_at", type="datetime", nullable=true)
+     */
+    private $notificationSentAt;
+
+    /**
      * @var integer
      *
      * @ORM\ManyToOne(targetEntity="Ok99\PrivateZoneCore\UserBundle\Entity\User")
@@ -223,5 +237,51 @@ class Media extends BaseMedia
     public function getUpdatedBy()
     {
         return $this->updatedBy;
+    }
+
+    /**
+     * Set notificationSentAt
+     *
+     * @param \DateTime $notificationSentAt
+     * @return Media
+     */
+    public function setNotificationSentAt($notificationSentAt)
+    {
+        $this->notificationSentAt = $notificationSentAt;
+
+        return $this;
+    }
+
+    /**
+     * Get notificationSentAt
+     *
+     * @return \DateTime
+     */
+    public function getNotificationSentAt()
+    {
+        return $this->notificationSentAt;
+    }
+
+    /**
+     * Set isNotifiable
+     *
+     * @param boolean $isNotifiable
+     * @return Media
+     */
+    public function setIsNotifiable(bool $isNotifiable)
+    {
+        $this->isNotifiable = $isNotifiable;
+
+        return $this;
+    }
+
+    /**
+     * Get isNotifiable
+     *
+     * @return boolean
+     */
+    public function getIsNotifiable()
+    {
+        return $this->isNotifiable;
     }
 }
