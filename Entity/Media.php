@@ -165,7 +165,7 @@ class Media extends BaseMedia
     /**
      * Get allowedUsers
      *
-     * @return User[]|\Doctrine\Common\Collections\Collection
+     * @return User[]
      */
     public function getAllowedUsers()
     {
