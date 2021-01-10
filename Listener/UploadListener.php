@@ -244,7 +244,7 @@ class UploadListener
             $attachment->setSize(filesize($pathname));
             $attachment->setMimetype($mimeType);
 
-            switch($extension) {
+            switch(strtolower($extension)) {
                 case 'jpg':
                 case 'jpeg':
                 case 'png':
