@@ -251,6 +251,11 @@ class UploadListener
                 case 'gif':
                 case 'bmp':
                     $attachment->setIcon('image');
+                    list($imageWidth, $imageHeight) = getimagesize($pathname);
+                    if ($imageWidth && $imageHeight) {
+                        $attachment->setWidth($imageWidth);
+                        $attachment->setHeight($imageHeight);
+                    }
                     break;
                 case 'doc':
                 case 'docx':
