@@ -95,7 +95,10 @@ class UploadListener
         }
 
         $provider = $this->pool->getProvider($providerName);
-        $provider->transform($media);
+
+        if ($mediaType == 'image') {
+            $provider->transform($media);
+        }
 
         $this->manager->save($media);
 

@@ -12,6 +12,8 @@ use Sonata\MediaBundle\Metadata\MetadataBuilderInterface;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\MediaBundle\Provider\FileProvider as BaseFileProvider;
 use Sonata\MediaBundle\Model\MediaInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -51,7 +53,14 @@ class FileProvider extends BaseFileProvider
         $filename = uniqid().'_'.$this->generateReferenceSlug($media).'.';
 
         if ($media->getBinaryContent()) {
-            $extension = $media->getBinaryContent()->getClientOriginalExtension();
+            $file = $media->getBinaryContent();
+
+            if (is_a($file, UploadedFile::class)) {
+                $extension = $file->getClientOriginalExtension();
+            } elseif (is_a($file, File::class)) {
+                $extension = $file->guessExtension();
+            }
+
             if (!$extension) {
                 $extension = $media->getBinaryContent()->guessExtension();
             }
