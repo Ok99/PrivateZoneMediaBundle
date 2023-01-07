@@ -23,31 +23,32 @@ class MediaAdminController extends Controller
             throw new AccessDeniedException();
         }
 
-        $linkTo = $request->query->get('linkTo', 'page');
+//        $linkTo = $request->query->get('linkTo', 'page');
 
         // params for both templates
         $tplName = null;
         $tplParams = array(
             'action' => 'browser',
             'base_template' => 'Ok99PrivateZoneMediaBundle::layout.html.twig',
-            'linkTo' => $linkTo,
+//            'linkTo' => $linkTo,
+            'linkTo' => 'media',
         );
 
         // page link
-        if ($linkTo == 'page') {
-            $pool = $this->get('ok99.privatezone.site.pool');
-            $currentSite = $pool->getCurrentSite($request);
-            $pageList =  $this->loadPageList($currentSite, $request->getLocale());
-
-            // set template values
-            $tplName = 'Ok99PrivateZoneMediaBundle:MediaAdmin:pages.html.twig';
-            $tplParams['pages'] = $pageList;
-            $tplParams['currentSite'] = $currentSite;
-            $tplParams['sites'] = $pool->getSites();
-        }
+//        if ($linkTo == 'page') {
+//            $pool = $this->get('ok99.privatezone.site.pool');
+//            $currentSite = $pool->getCurrentSite($request);
+//            $pageList =  $this->loadPageList($currentSite, $request->getLocale());
+//
+//            // set template values
+//            $tplName = 'Ok99PrivateZoneMediaBundle:MediaAdmin:pages.html.twig';
+//            $tplParams['pages'] = $pageList;
+//            $tplParams['currentSite'] = $currentSite;
+//            $tplParams['sites'] = $pool->getSites();
+//        }
 
         // media file link
-        else {
+//        else {
             $categoryManager = $this->container->get('sonata.classification.manager.category');
 
             $currentContext = $this->admin->getPersistentParameter('context');
@@ -97,7 +98,7 @@ class MediaAdminController extends Controller
                 'rootCategory' => $rootCategory,
                 'currentCategory' => $categoryManager->find($currentCategory),
             ));
-        }
+//        }
 
         // render template
         return $this->render($tplName, $tplParams);

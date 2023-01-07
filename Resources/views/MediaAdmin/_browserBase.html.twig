@@ -11,7 +11,10 @@
         $(function () {
             $(".select").click(function (e) {
                 e.preventDefault();
-                window.opener.CKEDITOR.tools.callFunction({{ app.request.get('CKEditorFuncNum')|escape('js') }}, $(this).attr("href"));
+
+                var mediaUrl = '{{ pz_protocol }}://{{ pz_host_name }}' + $(this).attr("href");
+
+                window.opener.CKEDITOR.tools.callFunction({{ app.request.get('CKEditorFuncNum')|escape('js') }}, mediaUrl);
 
                 // TODO better to rewrite CKEditor handler function to recognize link '{ path(..) }' as type <other>
                 // set protocol if specified
@@ -31,19 +34,19 @@
 {% block preview %}
     <div class="box box-primary">
         <div class="box-body row">
-            <div class="dropdown col-xs-12 col-md-3">
-                <strong>{{ "label.select_link_type"|trans({}, 'SonataMediaBundle') }}</strong>
-                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownLinkTo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    {{ ('label.link_to_' ~ linkTo)|trans({}, 'SonataMediaBundle') }}
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownLinkTo">
-                    <li>
-                        <a href="{{ admin.generateUrl('browser', ckParameters|merge({'linkTo': 'page'})) }}">{{ 'label.link_to_page'|trans({}, 'SonataMediaBundle') }}</a>
-                        <a href="{{ admin.generateUrl('browser', ckParameters|merge({'linkTo': 'media'})) }}">{{ 'label.link_to_media'|trans({}, 'SonataMediaBundle') }}</a>
-                    </li>
-                </ul>
-            </div>
+{#            <div class="dropdown col-xs-12 col-md-3">#}
+{#                <strong>{{ "label.select_link_type"|trans({}, 'SonataMediaBundle') }}</strong>#}
+{#                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownLinkTo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">#}
+{#                    {{ ('label.link_to_' ~ linkTo)|trans({}, 'SonataMediaBundle') }}#}
+{#                    <span class="caret"></span>#}
+{#                </button>#}
+{#                <ul class="dropdown-menu" aria-labelledby="dropdownLinkTo">#}
+{#                    <li>#}
+{#                        <a href="{{ admin.generateUrl('browser', ckParameters|merge({'linkTo': 'page'})) }}">{{ 'label.link_to_page'|trans({}, 'SonataMediaBundle') }}</a>#}
+{#                        <a href="{{ admin.generateUrl('browser', ckParameters|merge({'linkTo': 'media'})) }}">{{ 'label.link_to_media'|trans({}, 'SonataMediaBundle') }}</a>#}
+{#                    </li>#}
+{#                </ul>#}
+{#            </div>#}
             {% block preview_additional_menu %}{% endblock %}
         </div>
     </div>

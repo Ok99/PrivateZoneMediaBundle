@@ -119,8 +119,8 @@
                                 {% elseif field_description.name == 'name' %}
                                     <td>
                                         <div>
-                                            <a href="{{ path('ok99_privatezone_media_show', {'id': object.id}) }}" class="select" style="float: left; margin-right: 6px;">{% thumbnail object, 'admin' with {'width': 75} %}</a>
-                                            <strong><a href="{{ path('ok99_privatezone_media_show', {'id': object.id}) }}" class="select">{{ object.name }}</a></strong> <br />
+                                            <a href="{% path object, 'reference' %}" class="select" style="float: left; margin-right: 6px;">{% thumbnail object, 'admin' with {'width': 75} %}</a>
+                                            <strong><a href="{% path object, 'reference' %}" class="select">{{ object.name }}</a></strong> <br />
                                             {{ object.providerName|trans({}, 'SonataMediaBundle') }}{% if object.width %}: {{ object.width }}{% if object.height %}x{{ object.height }}{% endif %}px{% endif %}
                                             {% if formats[object.id]|length > 0 %}
                                                 - {{ 'title.formats'|trans({}, 'SonataMediaBundle') }}:

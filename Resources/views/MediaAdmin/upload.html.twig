@@ -1,1 +1,1 @@
-<script>window.parent.CKEDITOR.tools.callFunction({{ app.request.get('CKEditorFuncNum')|escape('js') }}, "{% path object, 'reference'|escape('js') %}");</script>
+<script>window.parent.CKEDITOR.tools.callFunction({{ app.request.get('CKEditorFuncNum')|escape('js') }}, "{{ pz_protocol }}://{{ pz_host_name }}{% path object, 'reference'|escape('js') %}");</script>
