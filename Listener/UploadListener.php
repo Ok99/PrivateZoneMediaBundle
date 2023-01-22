@@ -5,6 +5,7 @@ namespace Ok99\PrivateZoneCore\MediaBundle\Listener;
 use Behat\Behat\Util\Transliterator;
 use Ok99\PrivateZoneBundle\Entity\Attachment;
 use Ok99\PrivateZoneBundle\Entity\EmailAttachment;
+use Ok99\PrivateZoneBundle\Entity\TrainingGroup;
 use Oneup\UploaderBundle\Event\PostPersistEvent;
 use Sonata\MediaBundle\Model\MediaManagerInterface;
 use Sonata\ClassificationBundle\Model\CategoryManagerInterface;
@@ -57,6 +58,9 @@ class UploadListener
                 break;
             case 'media_email_attachment':
                 $this->emailAttachmentUpload($event);
+                break;
+            case 'media_training_group_image':
+                $this->trainingGroupUpload($event);
                 break;
             default:
                 $this->standardUpload($event);
@@ -173,6 +177,70 @@ class UploadListener
 
                     $user->{'set'.ucfirst($context)}($relativePathname);
                     $this->container->get('doctrine.orm.default_entity_manager')->flush($user);
+                    break;
+            }
+
+            $response = $event->getResponse();
+            $response['pathname'] = $relativePathname;
+        }
+    }
+
+    protected function trainingGroupUpload(PostPersistEvent $event)
+    {
+        $request = $event->getRequest();
+
+        $documentRoot = $this->container->get('kernel')->getRootDir() . '/../web';
+
+        /** @var File $file */
+        $file = $event->getFile();
+
+        /** @var TrainingGroup $trainingGroup */
+        $trainingGroupId = $this->container->get('request_stack')->getCurrentRequest()->getSession()->get(TrainingGroup::ID_HANDLER);
+        $trainingGroup = $this->container->get('doctrine.orm.entity_manager')->getRepository('Ok99PrivateZoneBundle:TrainingGroup')->find($trainingGroupId);
+
+        $context = $request->get('context');
+
+        switch($context) {
+            default:
+                $filenamePrefix = $trainingGroup->getId();
+                break;
+        }
+
+        $filename = sprintf('%s_%s.%s', $filenamePrefix, date('U'), strtolower($file->getExtension()));
+        $path = sprintf('%s/%s', $file->getPath(), $context);
+        $pathname = sprintf('%s/%s', $path, $filename);
+        $relativePathname = sprintf('/uploads/%s/%s/%s', $event->getType(), $context, $filename);
+
+        $file->move($path, $filename);
+
+        if (file_exists($pathname)) {
+            // remove all old images
+            foreach (glob($path . sprintf('/%s_*', $filenamePrefix)) as $file) {
+                if (is_file($file) && strtolower(basename($file)) != $filename) {
+                    @unlink($file);
+                }
+            }
+
+            switch($context) {
+                case 'photo':
+                    // remove all avatar thumbnails
+                    foreach(['t','tr'] as $baseDir) {
+                        $baseDirPath = sprintf('%s/%s', $documentRoot, $baseDir);
+                        $iterator = new \DirectoryIterator($baseDirPath);
+                        foreach ($iterator as $node) {
+                            if ($node->isDir() && !$node->isDot()) {
+                                $path = sprintf('%s%s/%s_*', $node->getPathname(), dirname($relativePathname), $trainingGroup->getId());
+                                foreach (glob($path) as $file) {
+                                    if (is_file($file) && strtolower(basename($file)) != strtolower($filename)) {
+                                        @unlink($file);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $trainingGroup->{'set'.ucfirst($context)}($relativePathname);
+                    $this->container->get('doctrine.orm.default_entity_manager')->flush($trainingGroup);
                     break;
             }
 
