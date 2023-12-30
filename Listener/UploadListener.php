@@ -4,6 +4,7 @@ namespace Ok99\PrivateZoneCore\MediaBundle\Listener;
 
 use Behat\Behat\Util\Transliterator;
 use Ok99\PrivateZoneBundle\Entity\Attachment;
+use Ok99\PrivateZoneBundle\Entity\CommentAttachment;
 use Ok99\PrivateZoneBundle\Entity\EmailAttachment;
 use Ok99\PrivateZoneBundle\Entity\TrainingGroup;
 use Oneup\UploaderBundle\Event\PostPersistEvent;
@@ -61,6 +62,9 @@ class UploadListener
                 break;
             case 'media_training_group_image':
                 $this->trainingGroupUpload($event);
+                break;
+            case 'media_comment_attachment':
+                $this->attachmentUpload($event, CommentAttachment::class);
                 break;
             default:
                 $this->standardUpload($event);
@@ -312,57 +316,27 @@ class UploadListener
 
             $attachment->setCode(uniqid());
             $attachment->setPath($relativePathname);
-            $attachment->setSize(filesize($pathname));
             $attachment->setMimetype($mimeType);
+            $attachment->setSize(filesize($pathname));
 
-            switch(strtolower($extension)) {
-                case 'jpg':
-                case 'jpeg':
-                case 'png':
-                case 'gif':
-                case 'bmp':
-                    $attachment->setIcon('image');
-                    list($imageWidth, $imageHeight) = getimagesize($pathname);
-                    if ($imageWidth && $imageHeight) {
-                        $attachment->setWidth($imageWidth);
-                        $attachment->setHeight($imageHeight);
-                    }
-                    break;
-                case 'doc':
-                case 'docx':
-                    $attachment->setIcon('word');
-                    break;
-                case 'xls':
-                case 'xlsx':
-                    $attachment->setIcon('excel');
-                    break;
-                case 'pwt':
-                case 'pwtx':
-                    $attachment->setIcon('powerpoint');
-                    break;
-                case 'pdf':
-                    $attachment->setIcon('pdf');
-                    break;
-                case 'txt':
-                case 'rtf':
-                    $attachment->setIcon('text');
-                    break;
-                case 'mpg':
-                case 'mpeg':
-                case 'avi':
-                case 'mov':
-                    $attachment->setIcon('video');
-                    break;
-                case 'zip':
-                case 'rar':
-                    $attachment->setIcon('archive');
-                    break;
-                default:
-                    $attachment->setIcon('file');
+            $attachment->setIcon($this->getIconNameForExtension(strtolower($extension)));
+
+            if (
+                $attachment->getIcon() === 'image' &&
+                $className !== CommentAttachment::class
+            ) {
+                list($imageWidth, $imageHeight) = getimagesize($pathname);
+                if ($imageWidth && $imageHeight) {
+                    $attachment->setWidth($imageWidth);
+                    $attachment->setHeight($imageHeight);
+                }
             }
 
             $attachment->setCreatedBy($user);
-            $attachment->setUpdatedBy($user);
+
+            if ($className !== CommentAttachment::class) {
+                $attachment->setUpdatedBy($user);
+            }
 
             $entityManager->persist($attachment);
             $entityManager->flush($attachment);
@@ -374,6 +348,50 @@ class UploadListener
             $response['size'] = $attachment->getSizeDecorated();
             $response['pathname'] = $relativePathname;
             $response['filename'] = $filename;
+        }
+    }
+
+    protected function getIconNameForExtension($extension)
+    {
+        switch(strtolower($extension)) {
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+            case 'bmp':
+                return 'image';
+
+            case 'doc':
+            case 'docx':
+                return 'word';
+
+            case 'xls':
+            case 'xlsx':
+                return 'excel';
+
+            case 'pwt':
+            case 'pwtx':
+                return 'powerpoint';
+
+            case 'pdf':
+                return 'pdf';
+
+            case 'txt':
+            case 'rtf':
+                return 'text';
+
+            case 'mpg':
+            case 'mpeg':
+            case 'avi':
+            case 'mov':
+                return 'video';
+
+            case 'zip':
+            case 'rar':
+                return 'archive';
+
+            default:
+                return 'file';
         }
     }
 
