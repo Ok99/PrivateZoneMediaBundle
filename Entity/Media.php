@@ -32,6 +32,12 @@ class Media extends BaseMedia
     protected $galleryHasMedias;
 
     /**
+     * @var string|null
+     * @ORM\Column(name="link", type="string", length=255, nullable=true)
+     */
+    protected $link;
+
+    /**
      * @var integer
      *
      * @ORM\ManyToOne(targetEntity="Ok99\PrivateZoneCore\ClassificationBundle\Entity\Category")
@@ -52,10 +58,10 @@ class Media extends BaseMedia
      *
      * @ORM\Column(name="is_notifiable", type="boolean")
      */
-    private $isNotifiable = true;
+    private $isNotifiable = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(name="notification_sent_at", type="datetime", nullable=true)
      */
@@ -151,6 +157,24 @@ class Media extends BaseMedia
     public function getLang()
     {
         return $this->lang;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLink()
+    {
+        return $this->link;
+    }
+
+    /**
+     * @param string|null $link
+     */
+    public function setLink($link): self
+    {
+        $this->link = $link;
+
+        return $this;
     }
 
     /**
@@ -255,7 +279,7 @@ class Media extends BaseMedia
     /**
      * Get notificationSentAt
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getNotificationSentAt()
     {

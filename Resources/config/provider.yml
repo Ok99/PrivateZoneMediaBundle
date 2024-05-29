@@ -1,6 +1,7 @@
 parameters:
     sonata.media.provider.file.class: Ok99\PrivateZoneCore\MediaBundle\Provider\FileProvider
     sonata.media.provider.image.class: Ok99\PrivateZoneCore\MediaBundle\Provider\ImageProvider
+    sonata.media.provider.link.class: Ok99\PrivateZoneCore\MediaBundle\Provider\LinkProvider
     sonata.media.thumbnail.format: Ok99\PrivateZoneCore\MediaBundle\Thumbnail\FormatThumbnail
 #    sonata.media.provider.file.class: Ok99\PrivateZoneCore\MediaBundle\Provider\DownloadProvider
 
@@ -20,6 +21,14 @@ services:
         arguments: [sonata.media.provider.image, @sonata.media.filesystem.local, @sonata.media.cdn.server, @sonata.media.generator.default, @sonata.media.thumbnail.format, [], [], @sonata.media.adapter.image.gd]
         calls:
             - [ setTemplates, [{helper_thumbnail: SonataMediaBundle:Provider:thumbnail.html.twig, helper_view: SonataMediaBundle:Provider:view_image.html.twig}] ]
+
+    sonata.media.provider.link:
+        class: %sonata.media.provider.link.class%
+        tags:
+            - { name: sonata.media.provider }
+        arguments: [sonata.media.provider.link, @sonata.media.filesystem.local, @sonata.media.cdn.server, @sonata.media.generator.default, @sonata.media.thumbnail.format]
+        calls:
+            - [ setTemplates, [{helper_thumbnail: SonataMediaBundle:Provider:thumbnail.html.twig, helper_view: Ok99PrivateZoneMediaBundle:Provider:view_link.html.twig}] ]
 
 #     ok99.privatezone.media.provider.download:
 #         class: %sonata.media.provider.file.class%

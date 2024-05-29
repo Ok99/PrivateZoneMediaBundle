@@ -5,6 +5,7 @@ namespace Ok99\PrivateZoneCore\MediaBundle\Provider;
 use Cocur\Slugify\Slugify;
 use Gaufrette\Filesystem;
 use Doctrine\ORM\EntityManager;
+use Sonata\CoreBundle\Validator\ErrorElement;
 use Sonata\MediaBundle\CDN\CDNInterface;
 use Sonata\MediaBundle\Generator\GeneratorInterface;
 use Sonata\MediaBundle\Thumbnail\ThumbnailInterface;
@@ -83,12 +84,11 @@ class FileProvider extends BaseFileProvider
      */
     public function buildEditForm(FormMapper $formMapper)
     {
-        $formMapper->add('name');
-        $formMapper->add('enabled', null, array('required' => false));
-        $formMapper->add('authorName');
-        $formMapper->add('cdnIsFlushable');
-        $formMapper->add('description');
-        $formMapper->add('copyright');
+        $formMapper->add('name', null, [
+            'constraints' => array(
+                new NotBlank(),
+            ),
+        ]);
         $formMapper->add('binaryContent', 'file', array('required' => false));
     }
 
@@ -97,14 +97,43 @@ class FileProvider extends BaseFileProvider
      */
     public function buildCreateForm(FormMapper $formMapper)
     {
-        $formMapper->add('name', null, array('required' => false));
-        $formMapper->add('description');
-        $formMapper->add('copyright');
+        $formMapper->add('name', null, [
+            'constraints' => array(
+                new NotBlank(),
+            ),
+        ]);
         $formMapper->add('binaryContent', 'file', array(
             'constraints' => array(
                 new NotBlank(),
-                new NotNull()
             )
         ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validate(ErrorElement $errorElement, MediaInterface $media)
+    {
+        if (!$media->getBinaryContent() instanceof \SplFileInfo) {
+            return;
+        }
+
+        if ($media->getBinaryContent() instanceof UploadedFile) {
+            $fileName = $media->getBinaryContent()->getClientOriginalName();
+        } elseif ($media->getBinaryContent() instanceof File) {
+            $fileName = $media->getBinaryContent()->getFilename();
+        } else {
+            throw new \RuntimeException(sprintf('Invalid binary content type: %s', get_class($media->getBinaryContent())));
+        }
+
+        if (
+            !in_array(strtolower(pathinfo($fileName, PATHINFO_EXTENSION)), $this->allowedExtensions) ||
+            !in_array($media->getBinaryContent()->getMimeType(), $this->allowedMimeTypes)
+        ) {
+            $errorElement
+                ->with('binaryContent')
+                ->addViolation('Dokument s příponou .%extension% není možné nahrát.', ['%extension%' => $media->getBinaryContent()->getClientOriginalExtension()])
+                ->end();
+        }
     }
 }

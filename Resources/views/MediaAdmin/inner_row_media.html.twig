@@ -50,6 +50,45 @@ file that was distributed with this source code.
 								<br />
 							{% endif %}
 							{{ 'list.label_createdAt'|trans({}, 'SonataMediaBundle') }}: {{ object.updatedAt|date('j. n. Y H:i') }}
+							<br/>
+							{{ 'list.label_enabled'|trans({}, 'SonataMediaBundle') }}: {{ (object.enabled ? 'list.enabled_yes' : 'list.enabled_no')|trans({}, 'SonataMediaBundle') }}
+							{% if object.notificationSentAt is not null %}
+								<br/>
+								{{ 'list.label_notificationSentAt'|trans({}, 'SonataMediaBundle') }}: {{ object.notificationSentAt|date('j. n. Y H:i') }}
+							{% endif %}
+							{% if object.allowedUsers is defined %}
+								<br/>
+								{{ 'allowed_users_list_label'|trans({}, 'Ok99PrivateZoneBundle') }}:
+								{% if object.allowedUsers and object.allowedUsers|length > 0 %}
+									{{ object.allowedUsers|join(', ') }}
+								{% else %}
+									{{ 'allowed_to_all_users_list_label'|trans({}, 'Ok99PrivateZoneBundle') }}
+								{% endif %}
+							{% endif %}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<br />
+		{% endif %}
+
+		{%  if (object.providerName == 'sonata.media.provider.image') %}
+			{% import 'Ok99PrivateZoneMediaBundle:MediaAdmin:_macro.html.twig' as macro %}
+			<table style="width:100%; margin-bottom:0">
+				<tbody>
+					<tr>
+						<td>
+							{% if object.name != object.providerMetadata.filename %}
+								{{ 'list.label_filename'|trans({}, 'SonataMediaBundle') }}: {{ object.providerMetadata.filename }}
+								<br />
+							{% endif %}
+							{{ 'list.label_createdAt'|trans({}, 'SonataMediaBundle') }}: {{ object.updatedAt|date('j. n. Y H:i') }}
+							<br/>
+							{{ 'list.label_enabled'|trans({}, 'SonataMediaBundle') }}: {{ (object.enabled ? 'list.enabled_yes' : 'list.enabled_no')|trans({}, 'SonataMediaBundle') }}
+							{% if object.notificationSentAt is not null %}
+								<br/>
+								{{ 'list.label_notificationSentAt'|trans({}, 'SonataMediaBundle') }}: {{ object.notificationSentAt|date('j. n. Y H:i') }}
+							{% endif %}
 							{% if object.allowedUsers is defined %}
 								<br/>
 								{{ 'allowed_users_list_label'|trans({}, 'Ok99PrivateZoneBundle') }}:
@@ -60,14 +99,42 @@ file that was distributed with this source code.
 								{% endif %}
 							{% endif %}
 							<br />
+							<br />
+							{% set filenameParts = object.providerMetadata.filename|split('.') %}
+							{{ 'list.label_type'|trans({}, 'SonataMediaBundle') }}: {{ filenameParts[filenameParts|length-1]|upper }}
+							<br />
+							{{ 'list.label_size'|trans({}, 'SonataMediaBundle') }}: {{ macro.fileSize(object.size) }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<br />
+		{% endif %}
+
+		{%  if (object.providerName == 'sonata.media.provider.link') %}
+			<table style="width:100%; margin-bottom:0">
+				<tbody>
+					<tr>
+						<td>
+							{{ 'list.label_link'|trans({}, 'SonataMediaBundle') }}: {{ object.link }}
+							<br />
+							{{ 'list.label_createdAt'|trans({}, 'SonataMediaBundle') }}: {{ object.updatedAt|date('j. n. Y H:i') }}
+							<br/>
 							{{ 'list.label_enabled'|trans({}, 'SonataMediaBundle') }}: {{ (object.enabled ? 'list.enabled_yes' : 'list.enabled_no')|trans({}, 'SonataMediaBundle') }}
-							{% if object.providerName == 'sonata.media.provider.image' %}
-								<br />
-								{% set filenameParts = object.providerMetadata.filename|split('.') %}
-								{{ 'list.label_type'|trans({}, 'SonataMediaBundle') }}: {{ filenameParts[filenameParts|length-1]|upper }}
-								<br />
-								{{ 'list.label_size'|trans({}, 'SonataMediaBundle') }}: {{ macro.fileSize(object.size) }}
+							{% if object.notificationSentAt is not null %}
+								<br/>
+								{{ 'list.label_notificationSentAt'|trans({}, 'SonataMediaBundle') }}: {{ object.notificationSentAt|date('j. n. Y H:i') }}
 							{% endif %}
+							{% if object.allowedUsers is defined %}
+								<br/>
+								{{ 'allowed_users_list_label'|trans({}, 'Ok99PrivateZoneBundle') }}:
+								{% if object.allowedUsers and object.allowedUsers|length > 0 %}
+									{{ object.allowedUsers|join(', ') }}
+								{% else %}
+									{{ 'allowed_to_all_users_list_label'|trans({}, 'Ok99PrivateZoneBundle') }}
+								{% endif %}
+							{% endif %}
+							<br />
 						</td>
 					</tr>
 				</tbody>

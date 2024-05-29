@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="title_select_provider">
                 <source>title_select_provider</source>
-                <target>Vyberte poskytovatele</target>
+                <target>Vyber typ dokumentu</target>
             </trans-unit>
             <trans-unit id="breadcrumb.link_media_create">
                 <source>breadcrumb.link_media_create</source>
@@ -88,7 +88,7 @@
             </trans-unit>
             <trans-unit id="name">
                 <source>Name</source>
-                <target>Jméno</target>
+                <target>Název</target>
             </trans-unit>
             <trans-unit id="Provider Reference">
                 <source>Provider Reference</source>
@@ -157,6 +157,10 @@
 			<trans-unit id="Binary Content">
 				<source>Binary Content</source>
 				<target>Soubor</target>
+			</trans-unit>
+			<trans-unit id="Link">
+				<source>Link</source>
+				<target>Adresa odkazu</target>
 			</trans-unit>
             <trans-unit id="label.size">
                 <source>label.size</source>
@@ -303,7 +307,7 @@
             </trans-unit>
             <trans-unit id="list.label_enabled">
                 <source>list.label_enabled</source>
-                <target>Aktivní</target>
+                <target>Publikováno</target>
             </trans-unit>
             <trans-unit id="list.label_name">
                 <source>list.label_name</source>
@@ -328,6 +332,10 @@
             <trans-unit id="list.label_createdAt">
                 <source>list.label_createdAt</source>
                 <target>Vloženo</target>
+            </trans-unit>
+            <trans-unit id="list.label_notificationSentAt">
+                <source>list.label_notificationSentAt</source>
+                <target>Notifikace odeslána</target>
             </trans-unit>
             <trans-unit id="sidemenu.link_edit_media">
                 <source>sidemenu.link_edit_media</source>
@@ -357,6 +365,10 @@
                 <source>sonata.media.provider.file</source>
                 <target>Soubor</target>
             </trans-unit>
+            <trans-unit id="sonata.media.provider.link">
+                <source>sonata.media.provider.link</source>
+                <target>Odkaz</target>
+            </trans-unit>
             <trans-unit id="sonata.media.provider.dailymotion.description">
                 <source>sonata.media.provider.dailymotion.description</source>
                 <target>Přidat video z DailyMotion</target>
@@ -376,6 +388,10 @@
             <trans-unit id="sonata.media.provider.file.description">
                 <source>sonata.media.provider.file.description</source>
                 <target>Přidat soubor</target>
+            </trans-unit>
+            <trans-unit id="sonata.media.provider.link.description">
+                <source>sonata.media.provider.link.description</source>
+                <target>Přidat odkaz</target>
             </trans-unit>
             <trans-unit id="title.media_preview">
                 <source>title.media_preview</source>
@@ -428,6 +444,10 @@
             <trans-unit id="list.label_filename">
                 <source>list.label_filename</source>
                 <target>Soubor</target>
+            </trans-unit>
+            <trans-unit id="list.label_link">
+                <source>list.label_link</source>
+                <target>Adresa</target>
             </trans-unit>
             <trans-unit id="list.enabled_yes">
                 <source>list.enabled_yes</source>
