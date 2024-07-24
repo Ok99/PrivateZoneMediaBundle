@@ -127,6 +127,7 @@ class UploadListener
         $request = $event->getRequest();
 
         $documentRoot = $this->container->get('kernel')->getRootDir() . '/../web';
+        $clubConfigurationPool = $this->container->get('ok99.privatezone.club_configuration_pool');
 
         /** @var File $file */
         $file = $event->getFile();
@@ -137,12 +138,19 @@ class UploadListener
 
         $context = $request->get('context');
 
+        $regnum = $user->getRegnum();
+
+        // when user is a guest
+        if ($clubConfigurationPool->getClubShortcut() !== $user->getClubShortcut()) {
+            $regnum = strtolower($user->getClubShortcut()) . $regnum;
+        }
+
         switch($context) {
             case 'avatar':
-                $filenamePrefix = sprintf('tmp_%s', $user->getRegnum());
+                $filenamePrefix = sprintf('tmp_%s', $regnum);
                 break;
             default:
-                $filenamePrefix = $user->getRegnum();
+                $filenamePrefix = $regnum;
                 break;
         }
 
