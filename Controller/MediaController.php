@@ -2,7 +2,10 @@
 
 namespace Ok99\PrivateZoneCore\MediaBundle\Controller;
 
+use Ok99\PrivateZoneCore\ClassificationBundle\Entity\Category;
+use Ok99\PrivateZoneCore\MediaBundle\Entity\Media;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Sonata\MediaBundle\Controller\MediaController as Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,13 +25,43 @@ class MediaController extends Controller
 	 */
 	public function showAction($id, $format = 'reference')
 	{
-		$media = $this->getMedia($id);
+        $token = $this->get('security.token_storage')->getToken();
+        if ($token === null) {
+            throw new AccessDeniedHttpException('unable to find the token');
+        }
 
-		if (!$media) {
-			throw new NotFoundHttpException(sprintf('unable to find the media with the id : %s', $id));
+        $user = $token->getUser();
+        if (!$user) {
+            throw new AccessDeniedHttpException('unable to find the user');
+        }
+
+        /** @var Media $media */
+		$media = $this->getMedia($id);
+        if (!$media) {
+			throw new NotFoundHttpException(sprintf('unable to find the media with the id: %s', $id));
 		}
 
-		$provider = $this->get($media->getProviderName());
+        if (
+            count($media->getAllowedUsers()) > 0
+            && !in_array($user, $media->getAllowedUsers())
+        ) {
+            throw new AccessDeniedHttpException('user does not allowed to this document');
+        }
+
+        /** @var Category $category */
+        $category = $media->getCategory();
+        if ($category === null) {
+            throw new NotFoundHttpException(sprintf('unable to find the category within the media id: %s', $id));
+        }
+
+        if (
+            count($category->getAllowedUsers()) > 0
+            && !in_array($user, $category->getAllowedUsers())
+        ) {
+            throw new AccessDeniedHttpException('user does not allowed to this category');
+        }
+
+        $provider = $this->get($media->getProviderName());
 
 		if ($format == 'reference') {
 			$file = $provider->getReferenceFile($media);
