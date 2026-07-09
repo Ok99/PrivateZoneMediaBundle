@@ -367,6 +367,8 @@ class UploadListener
             case 'png':
             case 'gif':
             case 'bmp':
+            case 'webp':
+            case 'avif':
                 return 'image';
 
             case 'doc':
